@@ -21,8 +21,18 @@ const req = http.request({
   headers: {
     'Content-Type': 'application/json; charset=utf-8',
   },
+  timeout: 10000,
 });
-console.log(process.env.SCREEPS_EMAIL);
 req.write(JSON.stringify(data));
+
+req.on('error', (e) => {
+  console.log(e);
+  process.exit(1);
+});
+
+req.on('timeout', () => {
+  console.log('Timeout, took longer than 10 seconds to deploy.');
+  process.exit(1);
+});
+
 req.end();
-console.log('done');
