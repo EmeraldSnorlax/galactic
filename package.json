@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "esbuild src/index.ts --platform=node --bundle --sourcemap --minify --outfile=dist/main.js",
-    "deploy": "yarn build && ts-node tools/deploy"
+    "deploy": "yarn build && ts-node tools/deploy",
+    "test": "echo \"Hint: no test specified\" && exit 0"
   },
   "devDependencies": {
     "@types/node": "^18.11.17",
