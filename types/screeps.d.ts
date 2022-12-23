@@ -1,7 +1,7 @@
 type StructureName = 'creep' | 'spawner' | 'constructionSite' | 'source' | 'mineral' | 'deposit' | 'flag' | 'controller';
 
 export interface Target {
-  pos: { x: number; y: number;}
+  pos: { x: number; y: number; }
   room: string;
   lastSeen: number;
   type: StructureName;
@@ -27,11 +27,10 @@ declare global {
   interface Memory {
     jobs: Job[];
   }
-}
-
-// eslint-disable-next-line no-unused-vars
-interface CreepMemory {
-  /** The ID of the job this creep is assigned to */
-  jobId: string;
-  role: Role;
+  // eslint-disable-next-line no-unused-vars
+  interface CreepMemory {
+    /** The ID of the job this creep is assigned to */
+    jobId: string;
+    role: Role;
+  }
 }
