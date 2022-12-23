@@ -1,57 +1,29 @@
-import { randomUUID } from 'crypto';
+import {
+  Job, Role, Target,
+} from '../types/screeps';
 
-console.log(`On tick ${Game.time}`);
+Memory.jobs = Memory.jobs || [];
 
-const buildingPriorities = {
-  spawn: 1,
-  controller: 0,
-};
-
-const numberOfCreeps = Object.keys(Game.creeps).length;
-const desiredCreeps = 4;
-
-if (numberOfCreeps < desiredCreeps) {
-  const creepName = randomUUID();
-  Game.spawns['Abandoned Ship'].spawnCreep([WORK, CARRY, MOVE], creepName, { memory: { isIdle: true } });
+function newJob(target: Target, role: Role, priority: number, desiredCreeps: number): Job {
+  return {
+    id: `${target.room}; T${Game.time} #${(Math.random() * 1000).toFixed(0)}`,
+    target,
+    role,
+    priority,
+    assignedCreeps: [],
+    desiredCreeps,
+  };
 }
 
-// Job dispatcher
-Object.entries(Game.rooms).forEach(([roomName, room]) => {
-  room.find(FIND_MY_STRUCTURES).forEach((structure) => {
-    switch (structure.structureType) {
-      // eslint-disable-next-line no-lone-blocks
-      case STRUCTURE_CONTROLLER: {
-        if (structure.level < 2) {
-          Memory.objectives.push({
-            priority: buildingPriorities[STRUCTURE_CONTROLLER],
-            type: 'work',
-            target: structure,
-            workers: [
-              Object.values(Game.creeps)
-                .filter((el) => Memory.creeps[el.name].isIdle)[0].name,
-            ],
-            location: structure.pos,
-          });
-        } else {
-          // amongus
-        }
-      }
-        break;
-      default: console.log(`Unhandled structure type: ${structure.structureType}`);
-    }
-  });
-});
-
-// Job executor
-Memory.objectives.forEach((objective) => {
-  objective.workers.forEach((worker) => {
-    const creep = Game.creeps[worker];
-    switch (objective.type) {
-      case 'work': {
-        creep.harvest(objective.target);
-      }
-        break;
-      default: console.log(`Unhandled objective type: ${objective.type}`);
-    }
-  });
+// Job creator
+// eslint-disable-next-line no-unused-vars
+Object.entries(Game.spawns).forEach(([name, spawn]) => {
+  if (!(Memory.jobs.find((job) => job.target.id === spawn.id))) {
+    const job = newJob({
+      id: spawn.id, lastSeen: Game.time, pos: spawn.pos, room: spawn.room.name, type: 'spawner',
+    }, 'harvester', 1, 2);
+    Memory.jobs.push(job);
+  } else {
+    Memory.jobs.find((j) => j.target.id === spawn.id)!.target.lastSeen = Game.time;
+  }
 });
